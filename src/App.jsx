@@ -34,7 +34,9 @@ export default function App() {
   const [finalTime, setFinalTime] = useState(0)
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [feedback, setFeedback] = useState(null)
+  const [nameError, setNameError] = useState("")
   const audioContext = useRef(null)
+  const hasPlayerName = playerName.trim().length > 0
 
   useEffect(() => {
     if (!started || finished || !startTime) return
@@ -129,6 +131,13 @@ export default function App() {
   }
 
   function startGame(table) {
+    if (!hasPlayerName) {
+      setNameError("กรุณากรอกชื่อก่อนเริ่มเกม")
+      return
+    }
+
+    setNameError("")
+    setPlayerName(playerName.trim())
     setSelectedTable(table)
 
     const qs = Array.from({ length: 12 }, (_, i) => {
@@ -162,6 +171,7 @@ export default function App() {
     setFinalTime(0)
     setElapsedSeconds(0)
     setFeedback(null)
+    setNameError("")
   }
 
   function formatTime(seconds) {
@@ -238,8 +248,18 @@ export default function App() {
                 placeholder="กรอกชื่อ"
                 className="mt-2 w-full rounded-2xl border-3 border-slate-200 bg-white px-5 py-4 text-xl font-bold text-slate-900 shadow-inner outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
                 value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
+                onChange={(e) => {
+                  setPlayerName(e.target.value)
+                  if (e.target.value.trim()) {
+                    setNameError("")
+                  }
+                }}
               />
+              {nameError && (
+                <p className="mt-3 rounded-2xl bg-rose-100 px-4 py-3 text-base font-bold text-rose-700">
+                  {nameError}
+                </p>
+              )}
             </div>
 
             <div className="rounded-[28px] border-4 border-white/80 bg-white/90 p-4 shadow-2xl sm:p-6">
@@ -258,7 +278,9 @@ export default function App() {
                     <button
                       key={table}
                       onClick={() => startGame(table)}
-                      className={`min-h-24 rounded-3xl bg-gradient-to-br ${tableColors[index]} p-4 text-left text-white shadow-lg shadow-slate-300/60 transition active:scale-95 sm:hover:-translate-y-1 sm:hover:shadow-xl`}
+                      className={`min-h-24 rounded-3xl bg-gradient-to-br ${tableColors[index]} p-4 text-left text-white shadow-lg shadow-slate-300/60 transition active:scale-95 sm:hover:-translate-y-1 sm:hover:shadow-xl ${
+                        hasPlayerName ? "" : "opacity-80"
+                      }`}
                     >
                       <span className="block text-sm font-bold opacity-90">
                         สูตรคูณ
